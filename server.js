@@ -2,8 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
 require('dotenv').config();
 const { uploadsDir, bundledUploadsDir } = require('./config/uploads');
+const openApiSpec = require('./docs/openapi');
 
 const app = express();
 
@@ -23,6 +25,13 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 app.use(express.json());
+
+app.get('/api-docs.json', (req, res) => res.json(openApiSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiSpec, {
+  explorer: true,
+  customSiteTitle: 'Osmar Figuras API — Swagger',
+  swaggerOptions: { persistAuthorization: false },
+}));
 
 // Hacer pública la carpeta 'uploads' para que las imágenes se puedan ver en la web
 app.use('/uploads', express.static(uploadsDir));
