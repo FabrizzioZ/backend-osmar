@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: backend-osmar
+    runtime: node
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.23.4
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URLS
+        sync: false
+      - key: PUBLIC_API_URL
+        sync: false
+      - key: UPLOADS_DIR
+        value: /tmp/osmar-figuras-uploads

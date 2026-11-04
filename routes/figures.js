@@ -2,19 +2,15 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const Figure = require('../models/Figure');
 const authenticate = require('../middleware/auth');
+const { uploadsDir } = require('../config/uploads');
 
 router.use(authenticate);
 
 // ⚙️ 1. Configuración de Multer (Esto faltaba definir)
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const destination = process.env.UPLOADS_DIR || path.join(__dirname, '..', 'uploads');
-    fs.mkdirSync(destination, { recursive: true });
-    cb(null, destination);
-  },
+  destination: (req, file, cb) => cb(null, uploadsDir),
   filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
 });
 const upload = multer({ storage: storage });
@@ -33,8 +29,8 @@ router.get('/', async (req, res) => {
 router.post('/', upload.single('image'), async (req, res) => {
   try {
     const { name, category, costo, valorUsd } = req.body;
-    
-    const imagePath = req.file 
+
+    const imagePath = req.file
       ? `${(process.env.PUBLIC_API_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '')}/uploads/${req.file.filename}`
       : 'https://via.placeholder.com/200x250/1e293b/facc15?text=Figura';
 

@@ -2,8 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs');
 require('dotenv').config();
+const { uploadsDir, bundledUploadsDir } = require('./config/uploads');
 
 const app = express();
 
@@ -25,9 +25,10 @@ app.use(cors({
 app.use(express.json());
 
 // Hacer pública la carpeta 'uploads' para que las imágenes se puedan ver en la web
-const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, 'uploads');
-fs.mkdirSync(uploadsDir, { recursive: true });
 app.use('/uploads', express.static(uploadsDir));
+if (path.resolve(uploadsDir) !== path.resolve(bundledUploadsDir)) {
+  app.use('/uploads', express.static(bundledUploadsDir));
+}
 
 app.get('/health', (req, res) => {
   const databaseReady = mongoose.connection.readyState === 1;
