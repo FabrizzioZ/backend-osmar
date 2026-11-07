@@ -6,7 +6,10 @@ const User = require('../models/User');
 
 router.post('/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
+    if (!/^\S+@\S+\.\S+$/.test(email)) return res.status(400).json({ message: 'Ingresa un correo electrónico válido.' });
+    if (password.length < 6 || password.length > 128) return res.status(400).json({ message: 'La contraseña debe tener entre 6 y 128 caracteres.' });
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: 'El correo ya está registrado' });
 
@@ -25,7 +28,9 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = String(req.body.email || '').trim().toLowerCase();
+    const password = String(req.body.password || '');
+    if (!email || !password) return res.status(400).json({ message: 'Ingresa tu correo y contraseña.' });
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: 'Usuario no encontrado' });
 
